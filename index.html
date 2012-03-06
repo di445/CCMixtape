@@ -1,5 +1,348 @@
-<!DOCTYPE html><html><head><title>Mixtape</title><link rel='stylesheet' type='text/css' href='./s.css' title='Style'/><script type="text/javascript" src='http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.js'></script><script type="text/javascript">var aue,prevvol,ff,actsearch;var curpage=1;function ca(){if ($.browser.msie){ff='mp31';}else{try{var audiotest=new Audio("");} catch (e){}if (audiotest.canPlayType!=false){if(("no"!=audiotest.canPlayType("audio/ogg")) &&
- (""!=audiotest.canPlayType("audio/ogg"))){ ff='ogg2';}else if(("no"!=audiotest.canPlayType("audio/mpeg")) &&
- (""!=audiotest.canPlayType("audio/mpeg"))){ff='mp31';}}}return ff;}function sm(){aue.pause();aue.currentTime=0;}function ct(track){aue.setAttribute('src',track.stream);$("#curartist").html(track.artist_name);$("#cursong").html('<a title="Visit track page on Jamendo" target="_blank" href="'+track.url+'">'+track.name+'</a>');$("#by").html('by');$("#playlist").find('a').each(function(){if($(this).attr('href')==track.stream){cc($(this));}});aue.load();aue.play();}function crt(id){return ($.parseJSON('{"name":"'+$(id).find(".song").html()+'","stream":"'+$(id).find("a:nth-child(2)").attr("href")+'","artist_name":"'+$(id).find(".artist").html()+'","url":"'+$(id).find(".link").attr("href")+'","tag_name":"'+$(id).find(".tagspan span").html()+'"}'));}function nt(){var id=parseInt($('.current').attr('id').substring(5))+1;if($('#playlist li').length==id){sm();}else{id='#track'+id;cc(id);ct(crt(id));}}function pt(){var id=parseInt($('.current').attr('id').substring(5))-1;if(id<0){sm();}else{id='#track'+id;cc(id);ct(crt(id));}}function cc(addto){$('.current').removeClass('current');$(addto).parent().addClass('current');}function atp(track){var p=$('#playlist li').length;var trackhtml=$('<li><a href="#"><span class="del">Delete</span></a> <a href="'+track.stream+'"><span class="song">'+track.name+'</span> by <span class="artist">'+track.artist_name+'</span></a><span class="tagspan">Genre: <span>'+track.tag_name+'</span></span><a href="'+track.url+'" class="link"></a></li>');var prevtrack;var curtrack='#track'+(p);if(p==0){prevtrack=$('#playlist');$(prevtrack).html('<li id="track'+p+'">'+trackhtml.html()+'</li>');}else{prevtrack='#track'+(p-1);$(prevtrack).after('<li id="track'+p+'">'+trackhtml.html()+'</li>');}$(curtrack+' a').click(function(e){cc(this);ct(track);e.preventDefault();});$(curtrack+' .del').click(function(){$(this).parent().parent().remove();if($('#playlist li').length==0){$('#playlist').append('<p>The playlist is empty</p>');}else{$('#playlist li').each(function(i){$(this).removeAttr('id');$(this).attr('id','track'+i);});}});}function ats(track){var p=$('#searchresults li').length;var trackhtml=$('<li><a href="#"><span class="add">Add</span></a> <span class="compsong"><span class="song">'+track.name+'</span> by <span class="artist">'+track.artist_name+'</span><span class="tagspan">Genre: '+track.tag_name+'</span></span></li>');$('#searchresults ul').append('<li id="searchtrack'+p+'">'+trackhtml.html()+'</li>');$('#searchtrack'+p+' a').click(function(e){atp(track);e.preventDefault();});$('#searchresults').show();}function sc(){$('.play').click(function(e){aue.play();e.preventDefault();});$('.pause').click(function(e){aue.pause();e.preventDefault();});$('.stop').click(function(e){sm();e.preventDefault();});$('.next').click(function(e){nt();e.preventDefault();});$('.prev').click(function(e){pt();e.preventDefault();});$('.volumeup').click(function(e){var vol=aue.volume+0.1;if(vol>1){vol=1;}sv(vol);e.preventDefault();});$('.volumedown').click(function(e){var vol=aue.volume-0.1;if(vol<0){vol=0;}sv(vol);e.preventDefault();});$('.volumemute').toggle(function(e){prevvol=aue.volume;aue.volume=0;$(this).html('Unmute');e.preventDefault();},function(e){aue.volume=prevvol;$(this).html('Mute');e.preventDefault();});}function sv(vol){aue.volume=vol;vol=(vol * 10).toFixed(0);$('.curvol').removeClass('curvol');var volid='#vol'+vol;$(volid).addClass('curvol');}function ls(data){if(actsearch==true){ $('#searchresults').empty()
-.append('<h2>Results</h2><ul></ul>');$.each(data,function(i,track){ats(track);});actsearch=false;ds(fu(ff,$('#songname').attr('value'),curpage+10));}else{if(data!=''){$('#nextsearch a').html('Next');$('#nextsearch').unbind()
-.click(function(e){actsearch=true;curpage=curpage+10;ds(fu(ff,$('#songname').attr('value'),curpage));e.preventDefault();});}else{$('#nextsearch a').html('');}}}function fu(ff,search,page){return 'http://api.jamendo.com/get2/name+stream+artist_name+url+tag_name/track/jsoncallback/track_album+album_artist/?n=10&order=searchweight_desc&streamencoding='+ff+'&searchquery='+search+'&pn='+page;}function ds(url){if($.browser.msie && window.XDomainRequest){var xdr=new XDomainRequest();xdr.open("get",url);xdr.onload=function(){data=$.parseJSON(xdr.responseText);ls(data);};xdr.send();}else{$.getJSON(url,ls);}}$(document).ready(function(){ff=ca();aue=document.createElement('audio');aue.addEventListener("ended",function(){nt();},false);sc();sv(0.8);$('#volume li').click(function(){sv($(this).attr('id').substring(3) / 10);});$(window).unload(function(){aue.pause();if($('#playlist li').length&&(!$('#save').is(':checked'))){localStorage.setItem('mixtapeplaylist',$('<ul></ul>').html( $('#playlist') ).html() );}else{localStorage.removeItem('mixtapeplaylist');}});$('form').submit(function(e){actsearch=true;ds(fu(ff,$('#songname').attr('value'),curpage));e.preventDefault();});if(localStorage.getItem('mixtapeplaylist')!=null){var list=($('<div></div>').append( $(localStorage.getItem('mixtapeplaylist')) ));list.find('li').each(function(){var track=crt(this);atp(track);if($(this).attr('class')=='current'){ct(track);}});}});</script></head><body><p class='intro'>This site was developed for the <a href='http://10k.aneventapart.com/Entry/231'>HTML5 in 10kb competition</a> by An Event Apart. As such, it requires the latest version of Firefox, Safari or Chrome to run.</p><header><ol><li><em>Search</em> the Jamendo music community with the Search box below</li><li><em>Add</em> these songs to the playlist with the Add button</li><li><em>Play</em> your music by clicking an item in your playlist</li><li><em>Return</em> to your automatically saved playlist next time</li></ol><h1>CCMixtape!</h1><p>A Creative Commons Playlist Creator and Music Player</p></header><div id='container'><section id='search'><h2>1. Search</h2><form method='get'><fieldset><div id='formcontents'><label for='songname'>Search Term</label><br /><input id='songname' name='songname' type='text' placeholder="e.g. Sunshine"/><input id='submit' name='submit' type='submit' value="Search"/></div><div id='searchresults'></div><p id="nextsearch"><a href="#"></a></p></fieldset></form></section><aside><h2>2. Playlist</h2><ul id='playlist'><p>The playlist is empty</p></ul><form><label for='save'>Clear Saved Playlist on Refresh</label><input type='checkbox' id='save' name='save'/></form></aside><div id='cont'><section><h2>3. Current Song</h2><div id='volume'><h3>Volume</h3><ul><li id='vol10'>1.0</li><li id='vol9'>0.9</li><li id='vol8'>0.8</li><li id='vol7'>0.7</li><li id='vol6'>0.6</li><li id='vol5'>0.5</li><li id='vol4'>0.4</li><li id='vol3'>0.3</li><li id='vol2'>0.2</li><li id='vol1'>0.1</li><li id='vol0'>0.0</li></ul></div><div id='cassette'><div id='label'><p id="cursong">&nbsp;</p><p id="by">&nbsp;</p><p id="curartist">&nbsp;</p><div id='centre'><div id='spindles'></div></div></div><div id='bottom'></div></div></section><section id='player'><ul><li><a href="#" class="play">Play</a></li><li><a href="#" class="pause">Pause</a></li><li><a href="#" class="stop">Stop</a></li><li><a href="#" class="next">Next</a></li><li><a href="#" class="prev">Previous</a></li><li><a href="#" class="volumedown">Volume Down</a></li><li><a href="#" class="volumeup">Volume Up</a></li><li><a href="#" class="volumemute">Mute</a></li></ul></section></div></div></body></html>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Mixtape</title>
+		<link rel='stylesheet' type='text/css' href='./s.css' title='Style'/>
+		<script type="text/javascript" src='http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.js'></script>
+		<script type="text/javascript">
+		var audioElement, prevvol, fileformat, actsearch;
+		var curpage = 1;
+
+		function checkaudio(){
+			if ($.browser.msie){
+				fileformat = 'mp31';
+			}else{
+				try {
+					var audiotest = new Audio("");
+					var audioObjSupport = !!(audiotestObj.canPlayType);
+					var basicAudioSupport = !!(!audioObjSupport ? audiotestObj.play : false);
+				} catch (e) {
+					var audioObjSupport = false;
+					var basicAudioSupport = false;
+				}
+				if (audiotest.canPlayType != false) {
+					if(("no" != audiotest.canPlayType("audio/ogg")) &&
+						 ("" != audiotest.canPlayType("audio/ogg"))){
+						 fileformat = 'ogg2';
+					}else if(("no" != audiotest.canPlayType("audio/mpeg")) &&
+						 ("" != audiotest.canPlayType("audio/mpeg"))){
+						fileformat = 'mp31'; 	
+					}
+				}
+			}
+			return fileformat;
+		}
+
+		function stopmusic(){
+			audioElement.pause();
+			audioElement.currentTime = 0;	
+		}
+
+		function changeTrack(track){
+			audioElement.setAttribute('src', track.stream);
+			$("#curartist").html(track.artist_name);
+			$("#cursong").html('<a title="Visit track page on Jamendo (Opens in new window)" target="_blank" href="' + track.url + '">' + track.name + '</a>');
+			$("#by").html('by');
+			$("#playlist").find('a').each(function(){
+				if($(this).attr('href') == track.stream){
+					curclass($(this));
+				}
+			});
+			audioElement.load();
+			audioElement.play();
+		}
+		
+		function createtrack(id){
+			return ($.parseJSON('{"name":"' + $(id).find(".song").html() + '","stream":"' + $(id).find("a:nth-child(2)").attr("href") + '","artist_name":"' + $(id).find(".artist").html() + '","url":"' + $(id).find(".link").attr("href") + '", "tag_name":"' + $(id).find(".tagspan span").html() + '"}'));
+
+		}
+		
+		function nextTrack(){
+			var id = parseInt($('.current').attr('id').substring(5)) + 1;
+			if($('#playlist li').length == id){
+				stopmusic();
+			}else{
+				id = '#track' + id;
+				curclass(id);
+				changeTrack(createtrack(id));
+			}
+		}
+		function prevTrack(){
+			var id = parseInt($('.current').attr('id').substring(5)) - 1;
+			if(id < 0){
+				stopmusic();
+			}else{
+				id = '#track' + id;
+				curclass(id);
+				changeTrack(createtrack(id));
+			}
+		}
+		
+		function curclass(addto){
+			$('.current').removeClass('current');
+			$(addto).parent().addClass('current');
+		}
+		
+		function addtoplaylist(track){
+			var position = $('#playlist li').length;
+			var trackhtml = $('<li><a href="#"><span class="del">Delete</span></a> <a href="' + track.stream + '"><span class="song">' + track.name + '</span> by <span class="artist">' + track.artist_name + '</span></a><span class="tagspan">Genre: <span>' + track.tag_name + '</span></span><a href="' + track.url + '" class="link"></a></li>');
+			var prevtrack;
+			var curtrack = '#track' + (position);
+			if(position == 0){
+				prevtrack = $('#playlist');
+				$(prevtrack).html('<li id="track' + position + '">' + trackhtml.html() + '</li>');
+			}else{
+				prevtrack = '#track' + (position-1);
+				$(prevtrack).after('<li id="track' + position + '">' + trackhtml.html() + '</li>');
+			}
+			$(curtrack + ' a').click(function(event){
+				curclass(this);
+				changeTrack(track);
+				event.preventDefault();
+			});
+			$(curtrack + ' .del').click(function(){
+				$(this).parent().parent().remove();
+				if($('#playlist li').length == 0){
+					$('#playlist').append('<p>The playlist is empty</p>');
+				}else{1
+					$('#playlist li').each(function(i){
+						$(this).removeAttr('id');
+						$(this).attr('id', 'track' + i);
+					});
+				}
+			});
+		}
+		
+		function addtosearch(track){
+			var position = $('#searchresults li').length;
+			var trackhtml = $('<li><a href="#"><span class="add">Add</span></a> <span class="compsong"><span class="song">' + track.name + '</span> by <span class="artist">' + track.artist_name + '</span><span class="tagspan">Genre: ' + track.tag_name + '</span></span></li>');
+			$('#searchresults ul').append('<li id="searchtrack' + position + '">' + trackhtml.html() + '</li>');
+			$('#searchtrack' + position + ' a').click(function(event){
+				addtoplaylist(track);
+				event.preventDefault();
+			});
+			$('#searchresults').show();
+		}
+		
+		function setupcontrols(){
+			$('.play').click(function() {
+				audioElement.play();
+				event.preventDefault();
+			});
+			$('.pause').click(function() {
+				audioElement.pause();
+				event.preventDefault();
+			});
+			$('.stop').click(function() {
+				stopmusic();
+				event.preventDefault();
+			});
+			$('.next').click(function() {
+				nextTrack();
+				event.preventDefault();
+			});
+			$('.prev').click(function() {
+				prevTrack();
+				event.preventDefault();
+			});
+			$('.volumeup').click(function() {
+				var vol = audioElement.volume + 0.1;
+				if(vol > 1){
+					vol = 1;
+				}
+				setvol(vol);
+				event.preventDefault();
+			});
+			$('.volumedown').click(function() {
+				var vol = audioElement.volume - 0.1;
+				if(vol < 0){
+					vol = 0;
+				}
+				setvol(vol);
+				event.preventDefault();
+			});
+			$('.volumemute').toggle(
+				function() {
+					prevvol = audioElement.volume;
+					audioElement.volume = 0;
+					$(this).html('Unmute');
+					event.preventDefault();
+				},function(){
+					audioElement.volume = prevvol;
+					$(this).html('Mute');
+					event.preventDefault();
+				}
+			);
+		}
+		
+		function setvol(vol){
+			audioElement.volume = vol;
+			vol = (vol * 10).toFixed(0);
+			$('.curvol').removeClass('curvol');
+			var volid = '#vol' + vol;
+			$(volid).addClass('curvol');
+		}
+		
+		function loadplaylist(tracks){
+			$.each(tracks, function(i, track){
+				addtoplaylist(track);
+			});
+		}
+		function loadsearch(data){
+			if(actsearch == true){
+		 		$('#searchresults').empty();
+				$('#searchresults').append('<h2>Results</h2><ul></ul>');
+				$.each(data, function(i, track){
+					addtosearch(track);
+				});
+				actsearch = false;
+				dosearch(formaturl(fileformat, $('#songname').attr('value'), curpage + 10));
+			}else{
+				if(data != ''){
+					$('#nextsearch a').html('Next');
+					$('#nextsearch').unbind();
+					$('#nextsearch').click(function(event){
+						actsearch = true;
+						curpage = curpage + 10;
+						dosearch(formaturl(fileformat, $('#songname').attr('value'), curpage));
+						event.preventDefault();
+					});
+				}else{
+					$('#nextsearch a').html('');	
+				}
+			}
+		}
+		
+		function formaturl(fileformat, search, page){
+			return 'http://api.jamendo.com/get2/name+stream+artist_name+url+tag_name/track/jsoncallback/track_album+album_artist/?n=10&order=searchweight_desc&streamencoding=' + fileformat + '&searchquery=' + search + '&pn=' + page;
+			
+		}
+		
+		function dosearch(url){
+			if($.browser.msie && window.XDomainRequest) {
+				var xdr = new XDomainRequest();
+				xdr.open("get", url);
+				xdr.onload = function(){
+					data = $.parseJSON(xdr.responseText);
+					loadsearch(data);
+				};
+				xdr.send();
+			}else{
+				$.getJSON(url, loadsearch);
+			}	
+		}
+		$(document).ready(function() {
+			fileformat = checkaudio();
+			audioElement = document.createElement('audio');
+			audioElement.addEventListener("ended",function(){
+				nextTrack();
+			}, false);
+			setupcontrols();
+			setvol(0.8);
+			$('#volume li').click(function(){
+				setvol($(this).attr('id').substring(3) / 10);
+			});
+			
+			$(window).unload(function(){
+				audioElement.pause();
+				if($('#playlist li').length){
+					localStorage.setItem('mixtapeplaylist', $('<ul></ul>').html( $('#playlist') ).html() );
+				}else{
+					localStorage.removeItem('mixtapeplaylist');
+				}
+			});
+			
+			$('form').submit(function(event){
+				actsearch = true;
+				dosearch(formaturl(fileformat, $('#songname').attr('value'), curpage));
+				event.preventDefault();
+			});
+			if(localStorage.getItem('mixtapeplaylist') != null){
+				var list = ($('<div></div>').append( $(localStorage.getItem('mixtapeplaylist')) ));
+				list.find('li').each(function(){
+					var track = createtrack(this);
+					addtoplaylist(track);
+					if($(this).attr('class') == 'current'){
+						changeTrack(track);
+					}
+				});
+			}
+		});
+		</script>
+	</head>
+	<body>
+		<header>
+			<ol>
+				<li><em>Search</em> the Jamendo music community with the Search box below</li>
+				<li><em>Add</em> these songs to the playlist with the Add button</li>
+				<li><em>Play</em> your music by clicking an item in your playlist</li>
+				<li><em>Return</em> to your automatically saved playlist next time</li>
+			</ol>
+			<h1>CCMixtape!</h1>
+			<p>A Creative Commons Playlist Creator and Music Player</p>
+		</header>
+		<div id='container'>	
+			<section id='search'>
+				<h2>1. Search</h2>
+				<form method='get'>
+					<fieldset>
+						<div id='formcontents'>
+							<label for='songname'>Search Term</label><br />
+							<input id='songname' name='songname' type='text' placeholder="e.g. Sunshine"/>
+							<input id='submit' name='submit' type='submit' value="Search"/>
+						</div>
+						<div id='searchresults'></div>
+						<p id="nextsearch"><a href="#"></a></p>
+					</fieldset>
+				</form>
+			</section>
+			<aside>
+				<h2>2. Playlist</h2>
+				<ul id='playlist'><p>The playlist is empty</p></ul>
+			</aside>
+						<div id='cont'>
+				<section>
+					<h2>3. Current Song</h2>
+					<div id='volume'>
+						<h3>Volume</h3>
+						<ul>
+							<li id='vol10'>1.0</li>
+							<li id='vol9'>0.9</li>
+							<li id='vol8'>0.8</li>
+							<li id='vol7'>0.7</li>
+							<li id='vol6'>0.6</li>
+							<li id='vol5'>0.5</li>
+							<li id='vol4'>0.4</li>
+							<li id='vol3'>0.3</li>
+							<li id='vol2'>0.2</li>
+							<li id='vol1'>0.1</li>
+							<li id='vol0'>0.0</li>
+						</ul>
+					</div>
+					<div id='cassette'>
+						<div id='label'>
+							<p id="cursong">&nbsp;</p>
+							<p id="by">&nbsp;</p>
+							<p id="curartist">&nbsp;</p>
+							<div id='centre'><div id='spindles'></div></div>
+						</div>
+						<div id='bottom'></div>
+					</div>
+				</section>
+				<section id='player'>
+					<ul>
+						<li><a href="#" class="play buttons">Play</a></li>
+						<li><a href="#" class="pause buttons">Pause</a></li>
+						<li><a href="#" class="stop buttons">Stop</a></li>
+						<li><a href="#" class="next buttons">Next</a></li>
+						<li><a href="#" class="prev buttons">Previous</a></li>
+						<li><a href="#" class="volumedown buttons">Volume Down</a></li>
+						<li><a href="#" class="volumeup buttons">Volume Up</a></li>
+						<li><a href="#" class="volumemute buttons">Mute</a></li>
+					</ul>
+				</section>
+			</div>
+
+		</div>
+	</body>
+</html>
